@@ -16,7 +16,11 @@ class TaskFactory extends Factory
     public function definition(): array
     {
         return [
-            'name'        => fake()->name(),
+            'name'        => fake()->randomElement([
+                'Setup Database',
+                'Create Button',
+                'Setup Cloud',
+            ]),
             'description' => fake()->paragraph(),
             'due_date'    => fake()->dateTimeBetween('now', '+30 days'),
             "project_id"  => fake()->numberBetween(1, 5),
