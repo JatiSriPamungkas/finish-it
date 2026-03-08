@@ -21,7 +21,7 @@ class TaskFactory extends Factory
             'due_date'    => fake()->dateTimeBetween('now', '+30 days'),
             "project_id"  => fake()->numberBetween(1, 5),
             "status_id"   => fake()->numberBetween(1, 3),
-            "priority_id" => fake()->numberBetween(1, 3),
+            "priority_id" => fake()->numberBetween(1, 4),
             "user_id"     => fake()->numberBetween(1, 5),
         ];
     }
