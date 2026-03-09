@@ -10,8 +10,8 @@
 </head>
 
 <body>
-    <main class="flex gap-32">
-        <aside class="flex h-screen flex-col justify-between border-e border-gray-300 bg-white">
+    <main class="bg-slate-100">
+        <aside class="fixed left-0 top-0 w-88.5 h-screen justify-between border-e border-gray-300 bg-white">
             <div class="px-6 py-10">
                 <div>
                     <svg width="250" viewBox="0 0 58 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -22,14 +22,14 @@
                     </svg>
                 </div>
 
-                <ul class="mt-12 space-y-1">
+                <ul class="mt-12 space-y-2">
                     <li>
-                        <a href="#"
+                        <a href="/"
                             class="flex items-center gap-4 rounded-lg px-4 py-2 font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
+                                    d="M2.25 7.125C2.25 6.504 2.754 6 3.375 6h6c.621 0 1.125.504 1.125 1.125v3.75c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 0 1-1.125-1.125v-3.75ZM14.25 8.625c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v8.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 0 1-1.125-1.125v-8.25ZM3.75 16.125c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 0 1-1.125-1.125v-2.25Z" />
                             </svg>
                             <p>
                                 Dashboard
@@ -37,7 +37,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#"
+                        <a href="/projects"
                             class="flex items-center gap-4 rounded-lg px-4 py-2 font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -52,7 +52,7 @@
                 </ul>
             </div>
 
-            <div class="sticky inset-x-0 bottom-0 border-t border-gray-200">
+            <div class="absolute bottom-0 border-t border-gray-200">
                 <a href="#" class="flex items-center gap-4 bg-white p-6 hover:bg-gray-50">
                     <img alt="" src="{{ asset('images/jati.jpg') }}" class="size-10 rounded-full object-cover">
                     <div>
@@ -65,18 +65,12 @@
                         stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
                     </svg>
-
                 </a>
             </div>
         </aside>
-        <section>
-            <div class="flex flex-col gap-2 py-10 text-gray-700">
-                <h1 class="text-4xl font-bold">Good Night, Jati 👋🏻</h1>
-                <p class="text-lg">What's your main focus today?</p>
-            </div>
-            <div>
-                {{ $slot }}
-            </div>
+
+        <section class="w-full min-h-screen pl-120 pr-32 py-10 flex flex-col gap-10">
+            {{ $slot }}
         </section>
     </main>
 </body>
