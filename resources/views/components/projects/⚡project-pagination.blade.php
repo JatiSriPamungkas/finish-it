@@ -29,7 +29,7 @@ new class extends Component {
         </li>
 
         <li
-            class="block size-8 rounded border border-indigo-600 bg-indigo-600 text-center text-sm/8 font-medium text-white">
+            class="block size-8 rounded border border-gray-700 bg-gray-600 text-center text-sm/8 font-medium text-white">
             2
         </li>
 
