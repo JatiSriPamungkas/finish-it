@@ -11,6 +11,6 @@ class ProjectMemberSeeder extends Seeder
      */
     public function run(): void
     {
-        ProjectMember::factory()->count(5)->create();
+        ProjectMember::factory()->count(30)->create();
     }
 }

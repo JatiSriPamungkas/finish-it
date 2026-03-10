@@ -16,8 +16,8 @@ class ProjectMemberFactory extends Factory
     public function definition(): array
     {
         return [
-            "user_id"    => fake()->numberBetween(1, 5),
-            "project_id" => fake()->numberBetween(1, 5),
+            "user_id"    => fake()->numberBetween(1, 20),
+            "project_id" => fake()->numberBetween(1, 3),
             'role_id'    => fake()->numberBetween(1, 3),
         ];
     }

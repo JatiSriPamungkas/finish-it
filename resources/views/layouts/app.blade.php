@@ -13,6 +13,11 @@
 </head>
 
 <body>
+    @if (session('status'))
+        <livewire:toast :icon="session('icon')" :type="session('type')">
+            {{ session('status') }}
+        </livewire:toast>
+    @endif
     <main class="bg-slate-100">
         <aside class="fixed left-0 top-0 w-88.5 h-screen justify-between border-e border-gray-300 bg-white">
             <div class="px-6 py-10">
@@ -52,24 +57,13 @@
                             </p>
                         </a>
                     </li>
+                    <li>
+                        {{-- <livewire:modal /> --}}
+                    </li>
                 </ul>
             </div>
 
-            <div class="absolute bottom-0 border-t border-gray-200">
-                <a href="#" class="flex items-center gap-4 bg-white p-6 hover:bg-gray-50">
-                    <img alt="" src="{{ asset('images/jati.jpg') }}" class="size-10 rounded-full object-cover">
-                    <div>
-                        <p class="text-sm">
-                            <strong class="block font-medium">Jati Sri Pamungkas</strong>
-                            <span> jatisripamungkas@gmail.com </span>
-                        </p>
-                    </div>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
-                    </svg>
-                </a>
-            </div>
+            <livewire:modal />
         </aside>
 
         <section class="w-full min-h-screen pl-120 pr-32 py-10 flex flex-col gap-10">

@@ -1,9 +1,25 @@
 <?php
 
 use Livewire\Component;
+use Carbon\Carbon;
 
 new class extends Component {
-    //
+    public $greeting;
+
+    public function mount()
+    {
+        $hour = Carbon::now('Asia/Jakarta')->hour;
+
+        if ($hour >= 5 && $hour < 12) {
+            $this->greeting = 'Good Morning';
+        } elseif ($hour >= 12 && $hour < 18) {
+            $this->greeting = 'Good Afternoon';
+        } elseif ($hour >= 18 && $hour < 22) {
+            $this->greeting = 'Good Evening';
+        } else {
+            $this->greeting = 'Good Night';
+        }
+    }
 };
 ?>
 
@@ -24,7 +40,9 @@ new class extends Component {
         </ol>
     </nav>
     <div class="flex flex-col gap-2 text-gray-700">
-        <h1 class="text-4xl font-bold">Good Night, Jati 👋🏻</h1>
+        <h1 class="text-4xl font-bold">{{ $greeting }}, @auth
+                {{ Auth::user()->name }}
+            @endauth 👋🏻</h1>
         <p class="text-lg">What's your main focus today?</p>
     </div>
     <div class="w-full grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-8">

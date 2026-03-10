@@ -52,6 +52,8 @@ new class extends Component {
     </div>
     <div class="w-125 rounded-md p-10 flex flex-col gap-8 border border-gray-700 bg-white">
         <form class="flex flex-col gap-4">
+            @csrf
+
             <label for="Name">
                 <span class="font-semibold text-gray-700"> Name </span>
 
