@@ -23,6 +23,7 @@ class ProjectFactory extends Factory
             ]),
             'description' => fake()->paragraph(),
             'is_active'   => fake()->boolean(),
+            'due_date'    => fake()->dateTimeBetween('+1 months', '+6 months'),
         ];
     }
 }

@@ -57,9 +57,6 @@
                             </p>
                         </a>
                     </li>
-                    <li>
-                        {{-- <livewire:modal /> --}}
-                    </li>
                 </ul>
             </div>
 
