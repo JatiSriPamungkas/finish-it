@@ -12,7 +12,6 @@ class TaskStatusSeeder extends Seeder
     public function run(): void
     {
         TaskStatus::create(['name' => 'done']);
-        TaskStatus::create(['name' => 'in_progress']);
-        TaskStatus::create(['name' => 'planning']);
+        TaskStatus::create(['name' => 'todo']);
     }
 }

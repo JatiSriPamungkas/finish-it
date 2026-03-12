@@ -15,6 +15,6 @@ Route::middleware('auth')->group(function () {
     Route::livewire('/', 'pages::dashboard');
     Route::livewire('/projects', 'pages::projects');
     Route::livewire('/projects/new', 'projects.new-project');
-    Route::livewire('/projects/{id}/task/new', 'tasks.new-task');
-    Route::livewire('/projects/{id}', 'pages::tasks');
+    Route::livewire('/projects/{projectId}/task/new', 'tasks.new-task');
+    Route::livewire('/projects/{projectId}', 'pages::tasks');
 });

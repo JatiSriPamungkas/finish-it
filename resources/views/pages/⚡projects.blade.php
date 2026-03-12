@@ -96,7 +96,6 @@ new class extends Component {
         @if (count($this->activeProjects) > 0)
             @foreach ($this->activeProjects as $project)
                 @php
-                    // Itung progress pake variabel lokal biar aman
                     $currentProgress = round(($project->tasks_done_count / max(1, $project->tasks_count)) * 100);
 
                     if ($currentProgress == 0) {
