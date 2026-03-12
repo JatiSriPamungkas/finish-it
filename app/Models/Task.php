@@ -8,7 +8,7 @@ class Task extends Model
 {
     /** @use HasFactory<\Database\Factories\TasksFactory> */
     use HasFactory;
-    protected $primaryKey = 'task_id';
+    protected $primaryKey = 'id';
     protected $fillable   = [
         "name",
         "description",

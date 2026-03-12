@@ -132,7 +132,7 @@ new class extends Component {
 
         @if ($this->myRole !== 3)
             <a class="flex gap-4 rounded-sm border border-gray-700 bg-gray-700 px-6 py-4 font-semibold text-white hover:bg-gray-600"
-                href="/projects/{{ $projectId }}/task/new">
+                href="/projects/{{ $this->projectId }}/task/new">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
                     stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -156,7 +156,7 @@ new class extends Component {
             <div class="flex flex-col items-start">
                 @foreach ($this->tasks as $task)
                     <livewire:tasks.task-list wire:key="task-item-{{ $task->id }}" :taskId="$task->id"
-                        :name="$task->name" :project="$task->project_name" :due="$task->due_date" />
+                        :name="$task->name" :project="$task->project_name" :due="$task->due_date" :projectId="$this->projectId" />
                 @endforeach
             </div>
         </fieldset>

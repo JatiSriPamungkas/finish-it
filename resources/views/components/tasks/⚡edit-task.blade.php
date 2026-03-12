@@ -6,16 +6,26 @@ use App\Models\Project;
 use App\Models\ProjectMember;
 
 new class extends Component {
+    public $taskId;
     public $name;
     public $project_id;
     public $due_date;
-    public $priority_id = 1;
+    public $priority_id;
     public $developer_id;
 
-    public function mount($projectId)
+    public function mount($projectId, $taskId)
     {
         $this->project_id = $projectId;
+        $this->taskId = $taskId;
+
+        $task = Task::findOrFail($taskId);
+
+        $this->name = $task->name;
+        $this->due_date = $task->due_date;
+        $this->priority_id = $task->priority_id;
+        $this->developer_id = $task->user_id;
     }
+
     protected $rules = [
         'name' => 'required|min:3',
         'project_id' => 'required|exists:projects,id',
@@ -28,16 +38,17 @@ new class extends Component {
     {
         $this->validate();
 
-        Task::create([
+        $task = Task::findOrFail($this->taskId);
+
+        $task->update([
             'name' => $this->name,
             'due_date' => $this->due_date,
             'project_id' => $this->project_id,
-            'status_id' => 2,
             'priority_id' => (int) $this->priority_id,
             'user_id' => (int) $this->developer_id,
         ]);
 
-        session()->flash('message', 'Task baru berhasil di-plot! 🚀');
+        session()->flash('message', 'Task berhasil di-update! ✅');
 
         return redirect()->to('/projects/' . $this->project_id);
     }
@@ -46,20 +57,14 @@ new class extends Component {
     {
         return [
             'projects' => Project::all(),
-            'developers' => ProjectMember::join('users', 'project_members.user_id', '=', 'users.id') // Gabungin tabel users
-                ->where('project_members.project_id', $this->project_id)
-                ->where('project_members.role_id', 3)
-                ->select('users.id', 'users.name')
-                ->where('project_members.project_id', $this->project_id)
-                ->where('project_members.role_id', 3)
-                ->get(),
+            'developers' => ProjectMember::join('users', 'project_members.user_id', '=', 'users.id')->where('project_members.project_id', $this->project_id)->where('project_members.role_id', 3)->select('users.id', 'users.name')->get(),
         ];
     }
 };
 ?>
 
 <div class="flex flex-col gap-10">
-    <x-slot:title>Finish It | New Task</x-slot:title>
+    <x-slot:title>Finish It | Edit Task</x-slot:title>
     <nav aria-label="Breadcrumb">
         <ol class="flex items-center gap-1 text-sm text-gray-700">
             <li>
@@ -104,6 +109,7 @@ new class extends Component {
                         clip-rule="evenodd"></path>
                 </svg>
             </li>
+
             <li>
                 <a href="/projects/{{ $project_id }}/" class="block transition-colors hover:text-gray-900"> Task</a>
             </li>
@@ -117,13 +123,25 @@ new class extends Component {
             </li>
 
             <li>
-                <p class="block transition-colors hover:text-gray-900"> New </p>
+                <a href="/projects/{{ $project_id }}" class="block transition-colors hover:text-gray-900"> Edit</a>
+            </li>
+
+            <li class="rtl:rotate-180">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        clip-rule="evenodd"></path>
+                </svg>
+            </li>
+
+            <li>
+                <p class="block transition-colors hover:text-gray-900"> {{ $taskId }} </p>
             </li>
         </ol>
     </nav>
     <div class="flex flex-col gap-2 text-gray-700">
-        <h1 class="text-4xl font-bold">New Task</h1>
-        <p class="text-lg">Plot your new Task.</p>
+        <h1 class="text-4xl font-bold">Edit Task</h1>
+        <p class="text-lg">Edit you current Task.</p>
     </div>
     <div class="w-125 rounded-md p-10 flex flex-col gap-8 border border-gray-700 bg-white">
         <form wire:submit.prevent="save" class="flex flex-col gap-4">
@@ -203,7 +221,7 @@ new class extends Component {
                 </button>
 
                 <a class="flex gap-2 rounded-sm border border-gray-700 bg-transparent px-4 py-2 font-semibold text-base text-gray-700 hover:bg-gray-200"
-                    href="/projects">
+                    href="/projects/{{ $project_id }}">
                     Cancel
                 </a>
             </div>

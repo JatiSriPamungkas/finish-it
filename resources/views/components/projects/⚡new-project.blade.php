@@ -43,6 +43,7 @@ new class extends Component {
 ?>
 
 <div class="flex flex-col gap-10">
+    <x-slot:title>Finish It | New Project</x-slot:title>
     <nav aria-label="Breadcrumb">
         <ol class="flex items-center gap-1 text-sm text-gray-700">
             <li>

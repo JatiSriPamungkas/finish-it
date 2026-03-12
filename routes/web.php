@@ -11,10 +11,10 @@ Route::middleware('guest')->group(function () {
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
-    // Route::get('/', [DashboardController::class, 'getCompletedTasksByRole'])->name('dashboard.index');
     Route::livewire('/', 'pages::dashboard');
     Route::livewire('/projects', 'pages::projects');
     Route::livewire('/projects/new', 'projects.new-project');
     Route::livewire('/projects/{projectId}/task/new', 'tasks.new-task');
+    Route::livewire('/projects/{projectId}/task/edit/{taskId}', 'tasks.edit-task');
     Route::livewire('/projects/{projectId}', 'pages::tasks');
 });
