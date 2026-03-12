@@ -3,12 +3,14 @@
 use Livewire\Component;
 use App\Models\Task;
 use App\Models\Project;
+use App\Models\ProjectMember;
 
 new class extends Component {
     public $name;
     public $project_id;
     public $due_date;
     public $priority_id = 1;
+    public $developer_id;
 
     public function mount($projectId)
     {
@@ -31,7 +33,7 @@ new class extends Component {
             'project_id' => $this->project_id,
             'status_id' => 2,
             'priority_id' => (int) $this->priority_id,
-            'user_id' => Auth::id(),
+            'user_id' => (int) $this->developer_id,
         ]);
 
         session()->flash('message', 'Task baru berhasil di-plot! 🚀');
@@ -43,6 +45,13 @@ new class extends Component {
     {
         return [
             'projects' => Project::all(),
+            'developers' => ProjectMember::join('users', 'project_members.user_id', '=', 'users.id') // Gabungin tabel users
+                ->where('project_members.project_id', $this->project_id)
+                ->where('project_members.role_id', 3)
+                ->select('users.id', 'users.name')
+                ->where('project_members.project_id', $this->project_id)
+                ->where('project_members.role_id', 3)
+                ->get(),
         ];
     }
 };
@@ -151,6 +160,20 @@ new class extends Component {
                     <option value="4">Urgent 🔴</option>
                 </select>
                 @error('priority_id')
+                    <span class="text-xs text-red-500">{{ $message }}</span>
+                @enderror
+            </label>
+
+            <label>
+                <span class="font-semibold text-gray-700"> Developer </span>
+                <select wire:model="developer_id"
+                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm @error('developer_id') border-red-500 @enderror">
+                    <option value="">-- Select Developer --</option>
+                    @foreach ($developers as $developer)
+                        <option value="{{ $developer->id }}">{{ $developer->name }}</option>
+                    @endforeach
+                </select>
+                @error('developer_id')
                     <span class="text-xs text-red-500">{{ $message }}</span>
                 @enderror
             </label>

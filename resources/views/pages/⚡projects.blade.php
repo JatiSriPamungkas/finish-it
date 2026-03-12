@@ -6,12 +6,18 @@ use Livewire\Attributes\Computed;
 
 new class extends Component {
     public $search = '';
+    public $myRole;
+    public $myId;
+
+    public function mount()
+    {
+        $this->myId = Auth::id();
+        $this->myRole = Auth::user()->role_id;
+    }
+
     #[Computed]
     public function activeProjects()
     {
-        $myId = Auth::id();
-        $myRole = Auth::user()->role_id;
-
         $query = Project::where('is_active', true)
             ->where('name', 'like', '%' . $this->search . '%')
             ->addSelect([
@@ -19,9 +25,9 @@ new class extends Component {
                 'tasks_done_count' => DB::table('tasks')->selectRaw('count(*)')->whereColumn('project_id', 'projects.id')->where('status_id', 1),
             ]);
 
-        if ($myRole !== 1) {
-            $query->whereIn('id', function ($sub) use ($myId) {
-                $sub->select('project_id')->from('project_members')->where('user_id', $myId);
+        if ($this->myRole !== 1) {
+            $query->whereIn('id', function ($sub) {
+                $sub->select('project_id')->from('project_members')->where('user_id', $this->myId);
             });
         }
 
@@ -82,7 +88,7 @@ new class extends Component {
             </label>
         </div>
 
-        <a class="flex gap-4 rounded-sm border border-gray-700 bg-gray-700 px-6 py-4 font-semibold text-white hover:bg-gray-600"
+        <a class="flex gap-4 rounded-sm border border-gray-700 bg-gray-700 px-6 py-4 font-semibold text-white hover:bg-gray-600 {{ $this->myRole === 3 ? 'hidden' : '' }}"
             href="/projects/new">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
                 stroke="currentColor" class="size-6">

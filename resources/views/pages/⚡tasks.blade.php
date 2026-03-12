@@ -7,30 +7,31 @@ use Livewire\Attributes\Computed;
 new class extends Component {
     public $projectId;
     public $search = '';
+    public $myRole;
+    public $myId;
 
     public function mount($projectId)
     {
         $this->projectId = $projectId;
+        $this->myId = Auth::id();
+        $this->myRole = Auth::user()->role_id;
     }
 
     #[Computed]
     public function tasks()
     {
-        $myId = Auth::id();
-        $myRole = Auth::user()->role_id;
-
         $query = Task::join('projects', 'tasks.project_id', '=', 'projects.id')
             ->select('tasks.*', 'projects.name as project_name', 'projects.id as project_id')
             ->where('tasks.project_id', $this->projectId)
             ->where('tasks.name', 'like', '%' . $this->search . '%');
 
-        if ($myRole !== 1) {
-            if ($myRole === 2) {
-                $query->whereIn('project_id', function ($sub) use ($myId) {
-                    $sub->select('project_id')->from('project_members')->where('user_id', $myId);
+        if ($this->myRole !== 1) {
+            if ($this->myRole === 2) {
+                $query->whereIn('project_id', function ($sub) {
+                    $sub->select('project_id')->from('project_members')->where('user_id', $this->myId);
                 });
             } else {
-                $query->where('user_id', $myId);
+                $query->where('user_id', $this->myId);
             }
         }
 
@@ -110,14 +111,17 @@ new class extends Component {
                 </div>
             </label>
         </div>
-        <a class="flex gap-4 rounded-sm border border-gray-700 bg-gray-700 px-6 py-4 font-semibold text-white hover:bg-gray-600"
-            href="/projects/{{ $projectId }}/task/new">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            New Task
-        </a>
+
+        @if ($this->myRole !== 3)
+            <a class="flex gap-4 rounded-sm border border-gray-700 bg-gray-700 px-6 py-4 font-semibold text-white hover:bg-gray-600"
+                href="/projects/{{ $projectId }}/task/new">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                    stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                New Task
+            </a>
+        @endif
     </div>
     <div class="w-full grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
         <livewire:tasks.task-stats

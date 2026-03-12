@@ -29,7 +29,7 @@ new class extends Component {
 ?>
 
 <a href="{{ $link }}"
-    class="flex flex-col gap-4 justify-between rounded-md border border-gray-300 p-4 shadow-sm bg-white hover:bg-gray-100/90 sm:p-6">
+    class="h-125 flex flex-col gap-4 justify-between rounded-md border border-gray-300 p-4 shadow-sm bg-white hover:bg-gray-100/90 sm:p-6">
     <div class="flex flex-col gap-4">
         <h1 class="font-semibold text-xl">{{ $title }}</h1>
         <p class="line-clamp-10">
