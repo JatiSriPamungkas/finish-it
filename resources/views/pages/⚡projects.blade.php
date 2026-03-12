@@ -3,8 +3,11 @@
 use Livewire\Component;
 use App\Models\Project;
 use Livewire\Attributes\Computed;
+use Livewire\WithPagination;
 
 new class extends Component {
+    use WithPagination;
+
     public $search = '';
     public $myRole;
     public $myId;
@@ -31,7 +34,7 @@ new class extends Component {
             });
         }
 
-        return $query->get();
+        return $query->paginate(4);
     }
 };
 ?>
@@ -127,5 +130,9 @@ new class extends Component {
                 </p>
             </div>
         @endif
+    </div>
+
+    <div class="mt-4">
+        {{ $this->activeProjects->links('vendor.pagination.custom') }}
     </div>
 </div>

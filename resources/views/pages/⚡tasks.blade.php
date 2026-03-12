@@ -3,8 +3,11 @@
 use Livewire\Component;
 use App\Models\Task;
 use Livewire\Attributes\Computed;
+use Livewire\WithPagination;
 
 new class extends Component {
+    use WithPagination;
+
     public $projectId;
     public $search = '';
     public $myRole;
@@ -35,15 +38,30 @@ new class extends Component {
             }
         }
 
-        return $query->get();
+        return $query->paginate(10);
     }
 
     #[Computed]
     public function stats()
     {
+        $query = Task::join('projects', 'tasks.project_id', '=', 'projects.id')
+            ->select('tasks.*', 'projects.name as project_name', 'projects.id as project_id')
+            ->where('tasks.project_id', $this->projectId)
+            ->where('tasks.name', 'like', '%' . $this->search . '%');
+
+        if ($this->myRole !== 1) {
+            if ($this->myRole === 2) {
+                $query->whereIn('project_id', function ($sub) {
+                    $sub->select('project_id')->from('project_members')->where('user_id', $this->myId);
+                });
+            } else {
+                $query->where('user_id', $this->myId);
+            }
+        }
+
         return [
-            'todo' => $this->tasks->where('status_id', 2)->count(),
-            'done' => $this->tasks->where('status_id', 1)->count(),
+            'todo' => (clone $query)->where('status_id', 2)->count(),
+            'done' => (clone $query)->where('status_id', 1)->count(),
         ];
     }
 };
@@ -142,5 +160,8 @@ new class extends Component {
                 @endforeach
             </div>
         </fieldset>
+    </div>
+    <div class="mt-4">
+        {{ $this->tasks->links('vendor.pagination.custom') }}
     </div>
 </div>

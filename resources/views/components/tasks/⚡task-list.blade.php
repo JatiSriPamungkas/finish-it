@@ -49,4 +49,5 @@ new class extends Component {
         </div>
     </div>
     <p>{{ $due }}</p>
+
 </label>
