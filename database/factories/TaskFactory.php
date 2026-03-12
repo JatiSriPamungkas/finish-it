@@ -30,7 +30,7 @@ class TaskFactory extends Factory
                 'Unit Testing Feature X',
                 'Refactoring Code Base',
             ]),
-            'description' => fake()->paragraph(),
+            'description' => fake()->paragraph(1),
             'due_date'    => fake()->dateTimeBetween('now', '+30 days'),
             "project_id"  => fake()->numberBetween(1, 6),
             "status_id"   => fake()->numberBetween(1, 2),

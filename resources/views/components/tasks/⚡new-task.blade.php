@@ -1,9 +1,50 @@
 <?php
 
 use Livewire\Component;
+use App\Models\Task;
+use App\Models\Project;
 
 new class extends Component {
-    //
+    public $name;
+    public $project_id;
+    public $due_date;
+    public $priority_id = 1;
+
+    public function mount($projectId)
+    {
+        $this->project_id = $projectId;
+    }
+    protected $rules = [
+        'name' => 'required|min:3',
+        'project_id' => 'required|exists:projects,id',
+        'due_date' => 'required|date',
+        'priority_id' => 'required|integer|in:1,2,3,4',
+    ];
+
+    public function save()
+    {
+        $this->validate();
+
+        Task::create([
+            'name' => $this->name,
+            'due_date' => $this->due_date,
+            'project_id' => $this->project_id,
+            'status_id' => 2,
+            'priority_id' => (int) $this->priority_id,
+            'user_id' => Auth::id(),
+        ]);
+
+        session()->flash('message', 'Task baru berhasil di-plot! 🚀');
+
+        return redirect()->to('/projects/' . $this->project_id);
+    }
+
+    public function with(): array
+    {
+        return [
+            'projects' => Project::all(),
+        ];
+    }
 };
 ?>
 
@@ -41,7 +82,8 @@ new class extends Component {
                 </svg>
             </li>
             <li>
-                <a href="/projects" class="block transition-colors hover:text-gray-900"> 1 </a>
+                <a href="/projects/{{ $project_id }}" class="block transition-colors hover:text-gray-900">
+                    {{ $project_id }} </a>
             </li>
 
             <li class="rtl:rotate-180">
@@ -52,7 +94,7 @@ new class extends Component {
                 </svg>
             </li>
             <li>
-                <a href="/projects" class="block transition-colors hover:text-gray-900"> Task</a>
+                <a href="/projects/{{ $project_id }}/" class="block transition-colors hover:text-gray-900"> Task</a>
             </li>
 
             <li class="rtl:rotate-180">
@@ -73,45 +115,70 @@ new class extends Component {
         <p class="text-lg">Plot your new Task.</p>
     </div>
     <div class="w-125 rounded-md p-10 flex flex-col gap-8 border border-gray-700 bg-white">
-        <form class="flex flex-col gap-4">
+        <form wire:submit.prevent="save" class="flex flex-col gap-4">
             @csrf
 
-            <label for="Name">
+            <label for="name">
                 <span class="font-semibold text-gray-700"> Name </span>
-
-                <input type="text" id="Name" placeholder="Task Name"
-                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm">
+                <input type="text" id="name" wire:model="name" placeholder="Task Name"
+                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm @error('name') border-red-500 @enderror">
+                @error('name')
+                    <span class="text-xs text-red-500">{{ $message }}</span>
+                @enderror
             </label>
 
-            <span class="font-semibold text-gray-700"> Project </span>
-            <select name="project" class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm">
-                <option value="Web Redesign">Web Redesign</option>
-                <option value="Mobile App v2.0">Mobile App v2.0</option>
-                <option value="Cloud Architecture">Cloud Architecture</option>
-            </select>
+            <label>
+                <span class="font-semibold text-gray-700"> Project </span>
+                <select wire:model="project_id"
+                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm @error('project_id') border-red-500 @enderror">
+                    <option value="">-- Select Project --</option>
+                    @foreach ($projects as $project)
+                        <option value="{{ $project->id }}">{{ $project->name }}</option>
+                    @endforeach
+                </select>
+                @error('project_id')
+                    <span class="text-xs text-red-500">{{ $message }}</span>
+                @enderror
+            </label>
 
-            <label for="Due Date">
+            <label>
+                <span class="font-semibold text-gray-700"> Priority </span>
+                <select wire:model="priority_id"
+                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm @error('priority_id') border-red-500 @enderror">
+                    <option value="1">Low 🟢</option>
+                    <option value="2">Medium 🟡</option>
+                    <option value="3">High 🟠</option>
+                    <option value="4">Urgent 🔴</option>
+                </select>
+                @error('priority_id')
+                    <span class="text-xs text-red-500">{{ $message }}</span>
+                @enderror
+            </label>
+
+            <label for="due_date">
                 <span class="font-semibold text-gray-700"> Due Date </span>
-
-                <input type="date" id="Due Date" placeholder="Due Date"
-                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm">
+                <input type="date" id="due_date" wire:model="due_date"
+                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm @error('due_date') border-red-500 @enderror">
+                @error('due_date')
+                    <span class="text-xs text-red-500">{{ $message }}</span>
+                @enderror
             </label>
+
             <div class="mt-8 flex justify-end gap-4">
-                <a class="flex gap-2 rounded-sm border border-gray-700 bg-gray-700 px-4 py-2 font-semibold text-base text-white hover:bg-gray-600"
-                    href="/projects/1/task/new">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" class="size-6">
+                <button type="submit" wire:loading.attr="disabled"
+                    class="flex gap-2 rounded-sm border border-gray-700 bg-gray-700 px-4 py-2 font-semibold text-base text-white hover:bg-gray-600 disabled:opacity-50">
+
+                    <svg wire:loading.remove xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>
 
-                    Save
-                </a>
+                    <span wire:loading.remove>Save</span>
+                    <span wire:loading>Plotting...</span>
+                </button>
+
                 <a class="flex gap-2 rounded-sm border border-gray-700 bg-transparent px-4 py-2 font-semibold text-base text-gray-700 hover:bg-gray-200"
-                    href="/projects/1">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
+                    href="/projects">
                     Cancel
                 </a>
             </div>
