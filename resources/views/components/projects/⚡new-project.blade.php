@@ -1,9 +1,44 @@
 <?php
 
 use Livewire\Component;
+use App\Models\Project;
+use App\Models\ProjectMember;
 
 new class extends Component {
-    //
+    public $name;
+    public $description;
+    public $due_date;
+    public $project_id;
+    public $user_id;
+    public $role_id;
+
+    protected $rules = [
+        'name' => 'required|min:3',
+        'description' => 'required',
+        'due_date' => 'required|date',
+    ];
+
+    public function save()
+    {
+        $this->validate();
+
+        $project = Project::create([
+            'name' => $this->name,
+            'description' => $this->description,
+            'due_date' => $this->due_date,
+            'is_active' => true,
+        ]);
+
+        ProjectMember::create([
+            'project_id' => $project->id,
+            'user_id' => Auth::id(),
+            'role_id' => Auth::user()->role_id,
+        ]);
+
+        session()->flash('message', 'Project berhasil dibuat! 🎉');
+
+        return redirect()->to('/projects');
+    }
 };
 ?>
 
@@ -51,39 +86,60 @@ new class extends Component {
         <p class="text-lg">Start your new Project.</p>
     </div>
     <div class="w-125 rounded-md p-10 flex flex-col gap-8 border border-gray-700 bg-white">
-        <form class="flex flex-col gap-4">
+        <form wire:submit.prevent="save" class="flex flex-col gap-4">
             @csrf
 
             <label for="Name">
                 <span class="font-semibold text-gray-700"> Name </span>
-
-                <input type="text" id="Name" placeholder="Project Name"
-                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm">
+                <input type="text" id="Name" wire:model="name" placeholder="Project Name"
+                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm @error('name') border-red-500 @enderror">
+                @error('name')
+                    <span class="text-xs text-red-500">{{ $message }}</span>
+                @enderror
             </label>
+
             <label for="Description">
                 <span class="font-semibold text-gray-700"> Description </span>
-
-                <textarea id="Description" placeholder="Description of the Project"
-                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm" rows="6"></textarea>
+                <textarea id="Description" wire:model="description" placeholder="Description of the Project"
+                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm @error('description') border-red-500 @enderror"
+                    rows="6"></textarea>
+                @error('description')
+                    <span class="text-xs text-red-500">{{ $message }}</span>
+                @enderror
             </label>
-            <label for="Due Date">
+
+            <label for="due_date">
                 <span class="font-semibold text-gray-700"> Due Date </span>
-
-                <input type="date" id="Due Date" placeholder="Due Date"
-                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm">
+                <input type="date" id="due_date" wire:model.live="due_date"
+                    class="mt-1 w-full rounded border-gray-300 shadow-sm p-2 sm:text-sm @error('due_date') border-red-500 @enderror">
+                @error('due_date')
+                    <span class="text-xs text-red-500">{{ $message }}</span>
+                @enderror
             </label>
+
             <div class="mt-8 flex justify-end gap-4">
-                <a class="flex gap-2 rounded-sm border border-gray-700 bg-gray-700 px-4 py-2 font-semibold text-base text-white hover:bg-gray-600"
-                    href="/projects/new">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" class="size-6">
+                <button type="submit" wire:loading.attr="disabled"
+                    class="flex gap-2 rounded-sm border border-gray-700 bg-gray-700 px-4 py-2 font-semibold text-base text-white hover:bg-gray-600 disabled:opacity-50">
+
+                    <svg wire:loading.remove xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>
 
-                    Save
-                </a>
+                    <svg wire:loading class="animate-spin size-6" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                            stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+
+                    <span wire:loading.remove>Save</span>
+                    <span wire:loading>Saving...</span>
+                </button>
+
                 <a class="flex gap-2 rounded-sm border border-gray-700 bg-transparent px-4 py-2 font-semibold text-base text-gray-700 hover:bg-gray-200"
-                    href="/projects/new">
+                    href="/projects">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />

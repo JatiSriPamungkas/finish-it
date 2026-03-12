@@ -24,7 +24,7 @@ class ProjectFactory extends Factory
                 'Redesign Landing Page',
                 'Lume Video Validator',
             ]),
-            'description' => fake()->paragraph(),
+            'description' => fake()->paragraph(1),
             'is_active'   => fake()->boolean(),
             'due_date'    => fake()->dateTimeBetween('+1 months', '+6 months'),
         ];

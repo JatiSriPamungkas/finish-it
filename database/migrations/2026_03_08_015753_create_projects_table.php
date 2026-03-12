@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description');
-            $table->boolean('is_active');
-            $table->date("due_date");
+            $table->boolean('is_active')->default(true);
+            $table->date("due_date")->nullable();
             $table->timestamps();
         });
     }

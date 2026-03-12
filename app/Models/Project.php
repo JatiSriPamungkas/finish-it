@@ -8,11 +8,11 @@ class Project extends Model
 {
     /** @use HasFactory<\Database\Factories\ProjectsFactory> */
     use HasFactory;
-    protected $primaryKey = 'project_id';
-
+    protected $primaryKey = 'id';
     protected $fillable = [
         "name",
         "description",
+        'due_date',
         "is_active",
     ];
     public function members() // Pastiin namanya sama dengan yang di whereHas
