@@ -8,7 +8,7 @@ class ProjectMember extends Model
 {
     use HasFactory;
     protected $table      = "project_members";
-    protected $primaryKey = 'project_members_id';
+    protected $primaryKey = 'project_member_id';
     public $timestamps    = false;
     protected $fillable   = [
         "user_id",

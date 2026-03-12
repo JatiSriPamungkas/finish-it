@@ -35,7 +35,7 @@ class TaskFactory extends Factory
             "project_id"  => fake()->numberBetween(1, 6),
             "status_id"   => fake()->numberBetween(1, 3),
             "priority_id" => fake()->numberBetween(1, 4),
-            "user_id"     => fake()->numberBetween(1, 51),
+            "user_id"     => fake()->numberBetween(1, 53),
         ];
     }
 }

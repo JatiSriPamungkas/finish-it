@@ -93,25 +93,6 @@ new class extends Component {
     </div>
 
     <div class="grid grid-cols-4 gap-8 text-gray-700">
-        {{-- {{ dump($activeProjects) }} --}}
-        {{-- @foreach ($activeProjects as $activeProject)
-            @php
-                $progress = round(($activeProject->tasks_done_count / max(1, $activeProject->tasks_count)) * 100);
-
-                if ($progress == 0) {
-                    $status = 'todo';
-                } elseif ($progress > 0 && $progress < 100) {
-                    $status = 'in_progress';
-                } else {
-                    $status = 'done';
-                }
-            @endphp
-            <livewire:projects.project-list link="/projects/{{ $activeProject->id }}" title="{{ $activeProject->name }}"
-                status="{{ $status }}" due="{{ $activeProject->due_date }}" progress="{{ $progress }}"
-                totalTask="{{ $activeProject->tasks_done_count }}/{{ $activeProject->tasks_count }}">
-                {{ $activeProject->description }}
-            </livewire:projects.project-list>
-        @endforeach --}}
         @if (count($this->activeProjects) > 0)
             @foreach ($this->activeProjects as $project)
                 @php
@@ -137,10 +118,9 @@ new class extends Component {
         @else
             <div class="col-span-4 p-10 text-center bg-yellow-100 border-2 border-yellow-400 rounded-xl">
                 <p class="text-yellow-700 font-bold text-lg text-pretty">
-                    Waduh Wak, project "{{ $search }}" kaga ketemu! 💀
+                    Project "{{ $search }}" not found ⚠️
                 </p>
             </div>
         @endif
     </div>
-    {{-- <livewire:projects.project-pagination /> --}}
 </div>

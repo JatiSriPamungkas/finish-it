@@ -42,64 +42,53 @@ new class extends Component {
         $myRole = Auth::user()->role_id;
 
         // Card: Task Completed
-        $queryCompletedTaskCount = Task::where('status_id', 1);
+        $queryTasks = Task::query();
         if ($myRole !== 1) {
-            $queryCompletedTaskCount->whereIn('project_id', function ($sub) use ($myId) {
+            $queryTasks->whereIn('project_id', function ($sub) use ($myId) {
                 $sub->select('project_id')->from('project_members')->where('user_id', $myId);
             });
         }
-        $this->completedTasksCount = $queryCompletedTaskCount->count();
 
-        $queryTotalTaskCount = DB::table('tasks');
-        if ($myRole !== 1) {
-            $queryTotalTaskCount->whereIn('project_id', function ($sub) use ($myId) {
-                $sub->select('project_id')->from('project_members')->where('user_id', $myId);
-            });
-        }
-        $totalTaskCount = $queryTotalTaskCount->count();
-
-        $this->completionRateCount = round(($this->completedTasksCount / $totalTaskCount) * 100);
+        $totalTaskCount = $queryTasks->count();
+        $this->completedTasksCount = (clone $queryTasks)->where('status_id', 1)->count();
+        $this->completionRateCount = $totalTaskCount > 0 ? round(($this->completedTasksCount / $totalTaskCount) * 100) : 0;
 
         // Card: Active Projects
-        $queryActiveProjectsCount = Project::where('is_active', true);
+        $queryActive = Project::where('is_active', true);
         if ($myRole !== 1) {
-            $queryActiveProjectsCount->whereIn('project_id', function ($sub) use ($myId) {
+            $queryActive->whereIn('id', function ($sub) use ($myId) {
                 $sub->select('project_id')->from('project_members')->where('user_id', $myId);
             });
         }
-        $this->activeProjectsCount = $queryActiveProjectsCount->count();
+        $this->activeProjectsCount = $queryActive->count();
+        $this->activeProjects = $queryActive
+            ->addSelect([
+                'tasks_count' => DB::table('tasks')->selectRaw('count(*)')->whereColumn('project_id', 'projects.id'),
+                'tasks_done_count' => DB::table('tasks')->selectRaw('count(*)')->whereColumn('project_id', 'projects.id')->where('status_id', 1),
+            ])
+            ->get();
 
-        $queryActiveProjects = Project::where('is_active', true)->addSelect([
-            'tasks_count' => DB::table('tasks')->selectRaw('count(*)')->whereColumn('project_id', 'projects.id'),
-
-            'tasks_done_count' => DB::table('tasks')->selectRaw('count(*)')->whereColumn('project_id', 'projects.id')->where('status_id', 1),
-        ]);
+        $queryNew = Project::where('created_at', '>=', now()->subDays(7));
         if ($myRole !== 1) {
-            $queryActiveProjects->whereIn('project_id', function ($sub) use ($myId) {
+            $queryNew->whereIn('id', function ($sub) use ($myId) {
                 $sub->select('project_id')->from('project_members')->where('user_id', $myId);
             });
         }
-        $this->activeProjects = $queryActiveProjects->get();
-
-        $queryNewProjectsThisWeekCount = DB::table('projects');
-        if ($myRole !== 1) {
-            $queryNewProjectsThisWeekCount->whereIn('project_id', function ($sub) use ($myId) {
-                $sub->select('project_id')->from('project_members')->where('user_id', $myId);
-            });
-        }
-        $this->newProjectsThisWeekCount = $queryNewProjectsThisWeekCount->where('created_at', '>=', now()->subDays(7))->count();
+        $this->newProjectsThisWeekCount = $queryNew->count();
 
         // Card: Team Members
-        $queryTeamMembersCount = DB::table('users');
-        if ($myRole !== 1) {
-            $queryTeamMembersCount
+        if ($myRole === 1) {
+            $this->teamMembersCount = User::where('id', '!=', $myId)->count();
+        } else {
+            // Cari temen yang satu project sama lo
+            $this->teamMembersCount = DB::table('project_members')
                 ->whereIn('project_id', function ($q) use ($myId) {
                     $q->select('project_id')->from('project_members')->where('user_id', $myId);
                 })
                 ->where('user_id', '!=', $myId)
-                ->distinct('user_id');
+                ->distinct('user_id')
+                ->count();
         }
-        $this->teamMembersCount = $queryTeamMembersCount->count();
     }
 };
 ?>
