@@ -1,9 +1,32 @@
 <?php
 
 use Livewire\Component;
+use App\Models\Project;
+use Livewire\Attributes\Computed;
 
 new class extends Component {
-    //
+    public $search = '';
+    #[Computed]
+    public function activeProjects()
+    {
+        $myId = Auth::id();
+        $myRole = Auth::user()->role_id;
+
+        $query = Project::where('is_active', true)
+            ->where('name', 'like', '%' . $this->search . '%')
+            ->addSelect([
+                'tasks_count' => DB::table('tasks')->selectRaw('count(*)')->whereColumn('project_id', 'projects.id'),
+                'tasks_done_count' => DB::table('tasks')->selectRaw('count(*)')->whereColumn('project_id', 'projects.id')->where('status_id', 1),
+            ]);
+
+        if ($myRole !== 1) {
+            $query->whereIn('id', function ($sub) use ($myId) {
+                $sub->select('project_id')->from('project_members')->where('user_id', $myId);
+            });
+        }
+
+        return $query->get();
+    }
 };
 ?>
 
@@ -53,7 +76,7 @@ new class extends Component {
                             </path>
                         </svg>
                     </button>
-                    <input type="search" id="Search" placeholder="Search"
+                    <input wire:model.live.debounce.300ms="search" type="search" id="Search" placeholder="Search"
                         class="w-full focus:outline-0 focus:border-0 ">
                 </div>
             </label>
@@ -70,38 +93,54 @@ new class extends Component {
     </div>
 
     <div class="grid grid-cols-4 gap-8 text-gray-700">
-        <livewire:projects.project-list link="/projects/1" title="Website Redesign" status="in_progress" due="Mar 12"
-            progress="25" totalTask="12/32">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Laborum commodi cum voluptatum,
-            ea minus,
-            sapiente dolore voluptates itaque tempore quod at incidunt soluta eius vel perferendis placeat
-            repellendus! Animi est esse veniam aspernatur placeat porro unde dicta eos nemo, optio dignissimos
-            consequatur commodi et recusandae asperiores aliquid quam suscipit officia?
-        </livewire:projects.project-list>
-        <livewire:projects.project-list link="/projects/2" title="Mobile App V2.0" status="done" due="Feb 20"
-            progress="100" totalTask="18/18">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Laborum commodi cum voluptatum,
-            ea minus,
-            sapiente dolore voluptates itaque tempore quod at incidunt soluta eius vel perferendis placeat
-            repellendus! Animi est esse veniam aspernatur placeat porro unde dicta eos nemo, optio dignissimos
-            consequatur commodi et recusandae asperiores aliquid quam suscipit officia?
-        </livewire:projects.project-list>
-        <livewire:projects.project-list link="/projects/3" title="Mobile App V2.0" status="done" due="Feb 20"
-            progress="100" totalTask="18/18">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Laborum commodi cum voluptatum,
-            ea minus,
-            sapiente dolore voluptates itaque tempore quod at incidunt soluta eius vel perferendis placeat
-            repellendus! Animi est esse veniam aspernatur placeat porro unde dicta eos nemo, optio dignissimos
-            consequatur commodi et recusandae asperiores aliquid quam suscipit officia?
-        </livewire:projects.project-list>
-        <livewire:projects.project-list link="/projects/4" title="Cloud Architecture" status="todo" due="Des 25"
-            progress="0" totalTask="0/24">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Laborum commodi cum voluptatum,
-            ea minus,
-            sapiente dolore voluptates itaque tempore quod at incidunt soluta eius vel perferendis placeat
-            repellendus! Animi est esse veniam aspernatur placeat porro unde dicta eos nemo, optio dignissimos
-            consequatur commodi et recusandae asperiores aliquid quam suscipit officia?
-        </livewire:projects.project-list>
+        {{-- {{ dump($activeProjects) }} --}}
+        {{-- @foreach ($activeProjects as $activeProject)
+            @php
+                $progress = round(($activeProject->tasks_done_count / max(1, $activeProject->tasks_count)) * 100);
+
+                if ($progress == 0) {
+                    $status = 'todo';
+                } elseif ($progress > 0 && $progress < 100) {
+                    $status = 'in_progress';
+                } else {
+                    $status = 'done';
+                }
+            @endphp
+            <livewire:projects.project-list link="/projects/{{ $activeProject->id }}" title="{{ $activeProject->name }}"
+                status="{{ $status }}" due="{{ $activeProject->due_date }}" progress="{{ $progress }}"
+                totalTask="{{ $activeProject->tasks_done_count }}/{{ $activeProject->tasks_count }}">
+                {{ $activeProject->description }}
+            </livewire:projects.project-list>
+        @endforeach --}}
+        @if (count($this->activeProjects) > 0)
+            @foreach ($this->activeProjects as $project)
+                @php
+                    // Itung progress pake variabel lokal biar aman
+                    $currentProgress = round(($project->tasks_done_count / max(1, $project->tasks_count)) * 100);
+
+                    if ($currentProgress == 0) {
+                        $status = 'todo';
+                    } elseif ($currentProgress > 0 && $currentProgress < 100) {
+                        $status = 'in_progress';
+                    } else {
+                        $status = 'done';
+                    }
+                @endphp
+
+                <livewire:projects.project-list wire:key="p-{{ $project->id }}" link="/projects/{{ $project->id }}"
+                    title="{{ $project->name }}" status="{{ $status }}" due="{{ $project->due_date }}"
+                    progress="{{ $currentProgress }}"
+                    totalTask="{{ $project->tasks_done_count }}/{{ $project->tasks_count }}">
+                    {{ $project->description }}
+                </livewire:projects.project-list>
+            @endforeach
+        @else
+            <div class="col-span-4 p-10 text-center bg-yellow-100 border-2 border-yellow-400 rounded-xl">
+                <p class="text-yellow-700 font-bold text-lg text-pretty">
+                    Waduh Wak, project "{{ $search }}" kaga ketemu! 💀
+                </p>
+            </div>
+        @endif
     </div>
-    <livewire:projects.project-pagination />
+    {{-- <livewire:projects.project-pagination /> --}}
 </div>

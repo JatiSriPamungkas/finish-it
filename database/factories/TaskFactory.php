@@ -17,16 +17,25 @@ class TaskFactory extends Factory
     {
         return [
             'name'        => fake()->randomElement([
-                'Setup Database',
                 'Create Button',
                 'Setup Cloud',
+                'Setup Database Migrations',
+                'Integrasi API Payment Gateway',
+                'Slicing UI Dashboard',
+                'Optimasi Query Database',
+                'Fixing Bug Login Session',
+                'Research User Experience',
+                'Deploy ke Server Production',
+                'Penulisan Dokumentasi API',
+                'Unit Testing Feature X',
+                'Refactoring Code Base',
             ]),
             'description' => fake()->paragraph(),
             'due_date'    => fake()->dateTimeBetween('now', '+30 days'),
-            "project_id"  => fake()->numberBetween(1, 3),
+            "project_id"  => fake()->numberBetween(1, 6),
             "status_id"   => fake()->numberBetween(1, 3),
             "priority_id" => fake()->numberBetween(1, 4),
-            "user_id"     => fake()->numberBetween(1, 21),
+            "user_id"     => fake()->numberBetween(1, 51),
         ];
     }
 }

@@ -148,10 +148,18 @@ new class extends Component {
             @foreach ($activeProjects as $activeProject)
                 @php
                     $progress = round(($activeProject->tasks_done_count / max(1, $activeProject->tasks_count)) * 100);
+
+                    if ($progress == 0) {
+                        $status = 'todo';
+                    } elseif ($progress > 0 && $progress < 100) {
+                        $status = 'in_progress';
+                    } else {
+                        $status = 'done';
+                    }
                 @endphp
                 <livewire:dashboard.active-projects link="/projects/{{ $activeProject->id }}"
-                    title="{{ $activeProject->name }}" status="in_progress" due="{{ $activeProject->due_date }}"
-                    progress="{{ $progress }}"
+                    title="{{ $activeProject->name }}" status="{{ $status }}"
+                    due="{{ $activeProject->due_date }}" progress="{{ $progress }}"
                     totalTask="{{ $activeProject->tasks_done_count }}/{{ $activeProject->tasks_count }}">
                     {{ $activeProject->description }}
                 </livewire:dashboard.active-projects>
